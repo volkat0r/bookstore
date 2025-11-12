@@ -1,0 +1,13 @@
+@font-face {
+    font-family: 'Inter Regular';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Inter Regular'), url('../assets/fonts/Inter-Regular.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'AlphaLyrae';
+    font-style: normal;
+    font-weight: normal;
+    src: local('AlphaLyrae'), url('../assets/fonts/AlphaLyrae-Medium.woff') format('woff');
+}
