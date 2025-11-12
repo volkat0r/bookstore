@@ -21,18 +21,16 @@ function renderCollectionItems(){
 
 // #region Like-Functionality
 function likeCounter(indexItem){
+    const colItem = collection[indexItem];
     const likeRef = document.querySelector(`.colItem-${indexItem} span.like`);
-    let likes = collection[indexItem].likes;
-    let likeBool = collection[indexItem].liked;
-    if(likeBool === true){
-        likes--;
-        collection[indexItem].liked = false;
+    if(colItem.liked){
+        colItem.likes--;
+        colItem.liked = false;
     } else {
-        likes++;
-        collection[indexItem].liked = true;
+        colItem.likes++;
+        colItem.liked = true;
     }
-    collection[indexItem].likes = likes;
-    likeRef.innerText = likes;
+    likeRef.innerText = colItem.likes;
     likeChecker(indexItem);
 }
  
