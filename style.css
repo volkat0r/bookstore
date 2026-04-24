@@ -1,4 +1,30 @@
 /* #region - collection Styles */
+.collectionStatus{
+    margin: 0 auto 1.5rem auto;
+    max-width: 44rem;
+    padding: 0.85rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--grey-border);
+    background: var(--grey4);
+    color: var(--white);
+}
+
+.collectionStatus.info{
+    background: #22313f;
+}
+
+.collectionStatus.loading{
+    background: #3f3322;
+}
+
+.collectionStatus.success{
+    background: #223828;
+}
+
+.collectionStatus.error{
+    background: #4a2323;
+}
+
 #favCollection,
 #collection{
     display: flex;

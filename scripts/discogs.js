@@ -1,16 +1,8 @@
-const DISCOGS_CONFIG = {
-    enabled: true,
-    username: "",
-    token: "",
-    folderId: 0,
-    page: 1,
-    perPage: 100
-};
-
 async function hydrateCollection(){
     const localCollection = getLocalStorage();
 
     if (!isDiscogsConfigured()) {
+        setCollectionStatus("info", "Static collection active. Add your Discogs username to load your personal library.");
         if (Array.isArray(localCollection) && localCollection.length > 0) {
             collection = localCollection;
         }
@@ -18,11 +10,14 @@ async function hydrateCollection(){
     }
 
     try {
-        const discogsReleases = await fetchDiscogsCollection();
+        setCollectionStatus("loading", `Loading Discogs collection for ${DISCOGS_CONFIG.username.trim()}...`);
+        const discogsReleases = await fetchAllDiscogsCollectionPages();
         collection = mapDiscogsCollectionToUiModel(discogsReleases, localCollection);
         setLocalStorage();
+        setCollectionStatus("success", `Loaded ${collection.length} records from Discogs.`);
     } catch (error) {
         console.warn("Discogs data could not be loaded. Falling back to local/static collection.", error);
+        setCollectionStatus("error", "Discogs could not be loaded. Using local or static data instead.");
         if (Array.isArray(localCollection) && localCollection.length > 0) {
             collection = localCollection;
         }
@@ -34,9 +29,28 @@ function isDiscogsConfigured(){
 }
 
 async function fetchDiscogsCollection(){
+    return fetchDiscogsCollectionPage(DISCOGS_CONFIG.page);
+}
+
+async function fetchAllDiscogsCollectionPages(){
+    let currentPage = DISCOGS_CONFIG.page;
+    let totalPages = DISCOGS_CONFIG.page;
+    const releases = [];
+
+    do {
+        const payload = await fetchDiscogsCollectionPage(currentPage);
+        releases.push(...payload.releases);
+        totalPages = payload.pagination.pages;
+        currentPage += 1;
+    } while (currentPage <= totalPages);
+
+    return releases;
+}
+
+async function fetchDiscogsCollectionPage(page){
     const username = encodeURIComponent(DISCOGS_CONFIG.username.trim());
     const params = new URLSearchParams({
-        page: String(DISCOGS_CONFIG.page),
+        page: String(page),
         per_page: String(DISCOGS_CONFIG.perPage)
     });
 
@@ -52,7 +66,10 @@ async function fetchDiscogsCollection(){
     }
 
     const payload = await response.json();
-    return Array.isArray(payload.releases) ? payload.releases : [];
+    return {
+        pagination: payload.pagination || { pages: page },
+        releases: Array.isArray(payload.releases) ? payload.releases : []
+    };
 }
 
 function mapDiscogsCollectionToUiModel(releases, localCollection){

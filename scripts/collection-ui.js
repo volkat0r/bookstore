@@ -10,6 +10,17 @@ function renderCollectionItems(){
     }
 }
 
+function setCollectionStatus(type, message){
+    const statusRef = document.getElementById("collection-status");
+    if (!statusRef) {
+        return;
+    }
+
+    statusRef.className = `collectionStatus ${type}`;
+    statusRef.textContent = message;
+    statusRef.hidden = false;
+}
+
 function likeCounter(indexItem){
     const colItem = collection[indexItem];
     const likeRef = document.querySelector(`.colItem-${indexItem} span.like`);
