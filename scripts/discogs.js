@@ -89,9 +89,11 @@ function mapDiscogsCollectionToUiModel(releases, localCollection){
             favorite: Boolean(localState.favorite),
             likes: Number.isFinite(localState.likes) ? localState.likes : 0,
             liked: Boolean(localState.liked),
-            price: Number.isFinite(item.median_price) && item.median_price > 0
-                ? item.median_price
-                : (Number.isFinite(item.lowest_price) ? item.lowest_price : 0),
+            price: Number.isFinite(localState.price) && localState.price > 0
+                ? localState.price
+                : (Number.isFinite(item.median_price) && item.median_price > 0
+                    ? item.median_price
+                    : (Number.isFinite(item.lowest_price) ? item.lowest_price : 0)),
             released: info.year || "-",
             genre: genres,
             pictureSrc: info.cover_image || "./assets/icons/favIcon.svg",
@@ -113,6 +115,7 @@ function createLocalStateMap(localCollection){
             favorite: Boolean(item.favorite),
             likes: Number(item.likes),
             liked: Boolean(item.liked),
+            price: Number.isFinite(item.price) && item.price > 0 ? item.price : null,
             comments: Array.isArray(item.comments) ? item.comments : []
         });
     }
