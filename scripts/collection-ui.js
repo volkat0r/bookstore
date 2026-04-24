@@ -1,12 +1,17 @@
-function renderCollectionItems(){
+let showFavOnly = false;
+
+function renderCollectionItems(indices){
     const collectionRef = document.getElementById("collection");
     collectionRef.innerHTML = "";
 
-    for(let indexItem = 0; indexItem < collection.length; indexItem++){
-        collectionRef.innerHTML += getCollectionItemTemplate(indexItem);
-        likeChecker(indexItem);
-        genreItems(indexItem);
-        renderComments(indexItem);
+    const list = Array.isArray(indices) ? indices : collection.map((_, i) => i);
+
+    for(const itemIndex of list){
+        collectionRef.innerHTML += getCollectionItemTemplate(itemIndex);
+        likeChecker(itemIndex);
+        favoriteChecker(itemIndex);
+        genreItems(itemIndex);
+        renderComments(itemIndex);
     }
 }
 
@@ -19,6 +24,41 @@ function setCollectionStatus(type, message){
     statusRef.className = `collectionStatus ${type}`;
     statusRef.textContent = message;
     statusRef.hidden = false;
+}
+
+function applyFiltersAndRender(){
+    const query = document.getElementById("search").value.toLowerCase().trim();
+    const sort = document.getElementById("sort").value;
+
+    let indices = collection.map((_, i) => i);
+
+    if(query){
+        indices = indices.filter(i =>
+            collection[i].album.toLowerCase().includes(query) ||
+            collection[i].band.toLowerCase().includes(query)
+        );
+    }
+
+    if(showFavOnly){
+        indices = indices.filter(i => collection[i].favorite);
+    }
+
+    if(sort === "year-asc")   indices.sort((a, b) => (collection[a].released || 0) - (collection[b].released || 0));
+    if(sort === "year-desc")  indices.sort((a, b) => (collection[b].released || 0) - (collection[a].released || 0));
+    if(sort === "price-asc")  indices.sort((a, b) => collection[a].price - collection[b].price);
+    if(sort === "price-desc") indices.sort((a, b) => collection[b].price - collection[a].price);
+
+    renderCollectionItems(indices);
+
+    const countRef = document.getElementById("result-count");
+    if(countRef) countRef.textContent = `${indices.length} of ${collection.length} records`;
+}
+
+function toggleFavFilter(){
+    showFavOnly = !showFavOnly;
+    const btn = document.getElementById("favFilter");
+    btn.classList.toggle("active", showFavOnly);
+    applyFiltersAndRender();
 }
 
 function likeCounter(indexItem){
@@ -44,6 +84,15 @@ function likeChecker(indexItem){
         likeRef.classList.remove("liked");
     }
     setLocalStorage();
+}
+
+function favoriteChecker(indexItem){
+    const favBtn = document.querySelector(`.colItem-${indexItem} .favBtn`);
+    if(collection[indexItem].favorite){
+        favBtn.classList.add("active");
+    } else {
+        favBtn.classList.remove("active");
+    }
 }
 
 function renderComments(indexItem){
@@ -83,4 +132,6 @@ function genreItems(indexItem){
 function favoriteItem(indexFavItem){
     const favBtn = document.querySelector(`.colItem-${indexFavItem} .favBtn`);
     favBtn.classList.toggle("active");
+    collection[indexFavItem].favorite = favBtn.classList.contains("active");
+    setLocalStorage();
 }

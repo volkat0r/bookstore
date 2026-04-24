@@ -19,6 +19,44 @@
       <h1>VinylStore</h1>
       <div class="wrapper">
         <div id="collection-status" class="collectionStatus" hidden></div>
+        <div class="controls">
+          <input
+            type="text"
+            id="search"
+            placeholder="Search by title or artist…"
+            oninput="applyFiltersAndRender()"
+          />
+          <select id="sort" onchange="applyFiltersAndRender()">
+            <option value="default">Sort: Default</option>
+            <option value="year-asc">Year ↑</option>
+            <option value="year-desc">Year ↓</option>
+            <option value="price-asc">Price ↑</option>
+            <option value="price-desc">Price ↓</option>
+          </select>
+          <button
+            id="favFilter"
+            class="favFilterBtn"
+            onclick="toggleFavFilter()"
+          >
+            <img
+              src="./assets/icons/star_inactive.svg"
+              class="inactive"
+              alt="All records"
+            />
+            <img
+              src="./assets/icons/star_active.svg"
+              class="active"
+              alt="Favourites only"
+            />
+            Favourites
+          </button>
+          <span id="result-count" class="resultCount"></span>
+          <button
+            id="loadPricesBtn"
+            class="loadPricesBtn"
+            onclick="loadMarketplacePrices()"
+          >Load Prices</button>
+        </div>
         <div id="collection"></div>
       </div>
     </main>
@@ -29,6 +67,7 @@
   <script src="./scripts/discogs-config.js"></script>
   <script src="./scripts/storage.js"></script>
   <script src="./scripts/discogs.js"></script>
+  <script src="./scripts/prices.js"></script>
   <script src="./scripts/collection-ui.js"></script>
   <script src="./script.js"></script>
 </html>

@@ -15,6 +15,7 @@ async function hydrateCollection(){
         collection = mapDiscogsCollectionToUiModel(discogsReleases, localCollection);
         setLocalStorage();
         setCollectionStatus("success", `Loaded ${collection.length} records from Discogs.`);
+        console.info("[Discogs] First raw record — inspect available fields:", discogsReleases[0]);
     } catch (error) {
         console.warn("Discogs data could not be loaded. Falling back to local/static collection.", error);
         setCollectionStatus("error", "Discogs could not be loaded. Using local or static data instead.");
@@ -88,11 +89,14 @@ function mapDiscogsCollectionToUiModel(releases, localCollection){
             favorite: Boolean(localState.favorite),
             likes: Number.isFinite(localState.likes) ? localState.likes : 0,
             liked: Boolean(localState.liked),
-            price: Number.isFinite(item.lowest_price) ? item.lowest_price : 0,
+            price: Number.isFinite(item.median_price) && item.median_price > 0
+                ? item.median_price
+                : (Number.isFinite(item.lowest_price) ? item.lowest_price : 0),
             released: info.year || "-",
             genre: genres,
             pictureSrc: info.cover_image || "./assets/icons/favIcon.svg",
-            comments: Array.isArray(localState.comments) ? localState.comments : []
+            comments: Array.isArray(localState.comments) ? localState.comments : [],
+            _releaseId: item.id || null
         };
     });
 }
